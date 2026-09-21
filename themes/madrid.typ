@@ -8,16 +8,20 @@
 /// - color (color): The primary color of the sphere.
 /// - light-color (color): The highlight color near the top-left light source.
 /// - dark-color (color): The shadow color near the bottom-right.
+/// - radius (length): The radius of the sphere. Default is `0.18em`.
+/// - baseline (length): The baseline offset of the sphere. Default is `-0.05em`.
 /// -> content
 #let beamer-ball(
   color: rgb("#3333b3"),
   light-color: rgb("#a8b8ff"),
   dark-color: rgb("#1a1a7a"),
+  radius: 0.18em,
+  baseline: -0.05em,
 ) = {
   box(
-    baseline: 10%,
+    baseline: baseline,
     circle(
-      radius: 3.2pt,
+      radius: radius,
       fill: gradient.radial(
         light-color,
         color,
@@ -25,7 +29,7 @@
         center: (35%, 35%),
         radius: 75%,
       ),
-      stroke: 0.25pt + dark-color,
+      stroke: 0.02em + dark-color,
     ),
   )
 }
@@ -323,6 +327,7 @@
   self = utils.merge-dicts(
     self,
     config-common(freeze-slide-counter: true),
+    config-page(margin: (top: 1.8em, bottom: 2.2em, x: 1.2em)),
     config,
   )
   self.store.title = none
@@ -348,40 +353,39 @@
   let body = {
     set std.align(center)
 
-    // Madrid's title material sits in the upper half of the page.
-    v(0.65em)
+    v(0.4em)
 
     // Rounded blue box with title
     block(
       fill: self.colors.primary,
-      inset: (x: 2em, y: 1.35em),
+      inset: (x: 1.5em, top: 0.85em, bottom: 0.85em),
       radius: 4.5pt,
       width: 100%,
       breakable: false,
       {
         text(
-          size: 1.45em,
+          size: 1.35em,
           fill: self.colors.neutral-lightest,
           weight: "medium",
           info.title,
         )
         if info.subtitle != none {
-          v(0.35em)
-          text(size: 0.95em, fill: self.colors.neutral-lightest, info.subtitle)
+          v(0.3em)
+          text(size: 0.9em, fill: self.colors.neutral-lightest, info.subtitle)
         }
       },
     )
 
-    v(1.0em)
+    v(0.8em)
 
     // Author(s)
     if info.authors.len() > 0 {
       grid(
         columns: (1fr,) * calc.min(info.authors.len(), 3),
         column-gutter: 1em,
-        row-gutter: 0.5em,
+        row-gutter: 0.4em,
         ..info.authors.map(author => text(
-          size: 1.05em,
+          size: 1.0em,
           fill: self.colors.neutral-darkest,
           author,
         ))
@@ -390,15 +394,15 @@
 
     // Institution
     if info.institution != none {
-      v(2.5em)
-      text(size: 0.9em, fill: self.colors.neutral-darkest, info.institution)
+      v(0.7em)
+      text(size: 0.85em, fill: self.colors.neutral-darkest, info.institution)
     }
 
     // Date
     if info.date != none {
-      v(1.0em)
+      v(0.7em)
       text(
-        size: 0.95em,
+        size: 0.85em,
         fill: self.colors.neutral-darkest,
         if type(info.date) == datetime {
           info.date.display(self.at("datetime-format", default: auto))
@@ -409,8 +413,8 @@
     }
 
     if extra != none {
-      v(1em)
-      text(size: 0.85em, extra)
+      v(0.6em)
+      text(size: 0.8em, extra)
     }
   }
 
@@ -537,10 +541,15 @@
       self.info.at("title", default: none)
     }
   },
-  footer-date: self => if self.info.at("date", default: none) != none {
-    utils.display-info-date(self)
-  } else {
-    none
+  footer-date: self => {
+    let short-date = self.info.at("short-date", default: auto)
+    if short-date != auto and short-date != none {
+      short-date
+    } else if self.info.at("date", default: none) != none {
+      utils.display-info-date(self)
+    } else {
+      none
+    }
   },
   primary: rgb("#3333b3"),
   primary-light: rgb("#e8ebfa"),

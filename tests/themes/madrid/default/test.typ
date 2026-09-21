@@ -3,7 +3,6 @@
 
 #show: madrid-theme.with(
   aspect-ratio: "16-9",
-  navigation-symbols: true,
   config-info(
     title: [Title],
     subtitle: [Subtitle],
@@ -29,6 +28,8 @@
   + Note for the slide.
   + Tests speaker notes in Madrid theme.
 ]
+
+== Blocks
 
 #cblock(title: [Block Title])[
   Standard block content.
